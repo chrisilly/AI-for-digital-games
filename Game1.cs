@@ -4,11 +4,19 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AI_for_digital_games
 {
+    public interface IBehaviourSystem
+    {
+        void Update(Agent body);
+        void Decide(Agent body);
+    }
+
     public class Game1 : Game
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+        Agent agent;
+        IBehaviourSystem brain;
         Texture2D texture;
 
         public Game1()
@@ -29,6 +37,8 @@ namespace AI_for_digital_games
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             texture = Content.Load<Texture2D>("tile64");
+            brain = new BrainDead();
+            agent = new Agent(brain, texture);
 
             // TODO: use this.Content to load your game content here
         }
@@ -39,6 +49,7 @@ namespace AI_for_digital_games
                 Exit();
 
             // TODO: Add your update logic here
+            agent.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -49,7 +60,7 @@ namespace AI_for_digital_games
 
             spriteBatch.Begin();
 
-            spriteBatch.Draw(texture, Vector2.Zero, Color.White);
+            agent.Draw(spriteBatch);
 
             spriteBatch.End();
 
