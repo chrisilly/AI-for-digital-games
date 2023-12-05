@@ -11,20 +11,12 @@ namespace AI_for_digital_games
     {
         public void Update(Agent body)
         {
-            body.Move(GetRandomDirection());
+            
         }
 
         public void Decide(Agent body)
         {
             
-        }
-
-        Vector2 GetRandomDirection()
-        {
-            Random random = new Random();
-            int x = random.Next(-1, 2);
-            int y = random.Next(-1, 2);
-            return new Vector2(x, y);
         }
     }
 }

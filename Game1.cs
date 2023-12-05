@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -15,9 +16,15 @@ namespace AI_for_digital_games
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        Agent agent;
+        public static Random random { get; private set; } = new Random();
+        public static int ScreenWidth { get; private set; }
+        public static int ScreenHeight { get; private set; }
+        public static Vector2 ScreenCenter { get { return new Vector2(ScreenWidth / 2, ScreenHeight / 2); } }
+
+        Agent subject;
+        AgentHandler agentHandler;
         IBehaviourSystem brain;
-        Texture2D texture;
+        public static Texture2D texture;
 
         public Game1()
         {
@@ -29,6 +36,11 @@ namespace AI_for_digital_games
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            ScreenWidth = GraphicsDevice.Viewport.Width;
+            ScreenHeight = GraphicsDevice.Viewport.Height;
+
+            agentHandler = new AgentHandler();
+            brain = new BrainDead();
 
             base.Initialize();
         }
@@ -37,10 +49,9 @@ namespace AI_for_digital_games
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             texture = Content.Load<Texture2D>("tile64");
-            brain = new BrainDead();
-            agent = new Agent(brain, texture);
 
-            // TODO: use this.Content to load your game content here
+            subject = new Agent(brain, Color.White, 0.5f);
+            agentHandler.AddAgent(subject);
         }
 
         protected override void Update(GameTime gameTime)
@@ -49,7 +60,7 @@ namespace AI_for_digital_games
                 Exit();
 
             // TODO: Add your update logic here
-            agent.Update(gameTime);
+            agentHandler.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -60,11 +71,25 @@ namespace AI_for_digital_games
 
             spriteBatch.Begin();
 
-            agent.Draw(spriteBatch);
+            agentHandler.Draw(spriteBatch);
 
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        public static Vector2 GetRandomPosition()
+        {
+            int x = random.Next(0, ScreenWidth-64);
+            int y = random.Next(0, ScreenHeight-64);
+            return new Vector2(x, y);
+        }
+
+        public static Vector2 GetRandomDirection()
+        {
+            int x = random.Next(-1, 2);
+            int y = random.Next(-1, 2);
+            return new Vector2(x, y);
         }
     }
 }
