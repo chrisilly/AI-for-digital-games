@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,12 +10,14 @@ using System.Threading.Tasks;
 
 namespace AI_for_digital_games
 {
-    internal class AgentHandler
+    public class AgentHandler
     {
         List<Agent> agents = new List<Agent>();
         int dummySpawnInterval = Game1.random.Next(1000, 5000);
-        float timer = 0;
+        float dummySpawnTimer = 0;
         int agentCap = 10;
+
+        Agent special;
 
         public void Update(GameTime gameTime)
         {
@@ -32,60 +35,71 @@ namespace AI_for_digital_games
                 {
                     if (agent == other) continue;
 
-                    if(agent.IsColliding(other))
+                    if (agent.IsColliding(other))
                     {
                         if (agent.IsBiggerThan(other))
                             agent.Eat(other);
-                        else if(other.IsBiggerThan(agent))
+                        else if (other.IsBiggerThan(agent))
                             other.Eat(agent);
                     }
                 }
 
-                agent.Update(gameTime);
+                agent.Update();
+                agent.Brain.Update(this, agent, gameTime);
             }
 
             if (agents.Count < agentCap)
                 SpawnDummies(gameTime);
         }
 
+        public void SpawnSpecialAgent(IBehaviourSystem brain)
+        {
+            if(special != null)
+                agents.Remove(special);
+
+            special = new Agent(brain, Color.White, 2f);
+            AddAgent(special);
+        }
+
         // Spawns dummy agents on a timer with random intervals
         public void SpawnDummies(GameTime gameTime)
-        {           
-            timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+        {
+            dummySpawnTimer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
 
-            if (timer >= dummySpawnInterval)
+            if (dummySpawnTimer >= dummySpawnInterval)
             {
-                AddAgent(new Agent(new BrainDead(), Color.Red, 0.3f));
+                float randomSize = (float)Game1.random.NextDouble();
+                AddAgent(new Agent(new DecisionTreeBrain(), Color.Red, randomSize));
                 Debug.WriteLine("Spawned new dummy.");
                 dummySpawnInterval = Game1.random.Next(1000, 5000);
-                timer = 0;
+                dummySpawnTimer = 0;
             }
         }
 
-        public void MoveToNearestFood(Agent subject)
+        public void FleeDanger(Agent subject)
         {
-            Agent nearestAgent = GetNearestFood(subject);
-
-            if (nearestAgent != null)
-            {
-                //subject.MoveTo(nearestAgent.Position);
-            }
+            subject.SteerFromDanger(GetNearestThreat(subject));
         }
 
-        private Agent GetNearestFood(Agent subject)
+        public void ChaseFood(Agent subject)
+        {
+            subject.SteerToTarget(GetNearestFood(subject));
+        }
+
+        Agent GetNearestFood(Agent subject)
         {
             Agent nearestAgent = null;
             float nearestDistance = (float)Math.Sqrt(Math.Pow(Game1.ScreenWidth, 2) + Math.Pow(Game1.ScreenHeight, 2));
 
-            foreach (Agent agent in agents)
+            foreach (Agent other in agents)
             {
-                if (agent == subject) continue;
+                if (other == subject) continue;
 
-                float distance = Vector2.Distance(agent.Position, subject.Position);
+                float distance = Vector2.Distance(subject.Position, other.Position);
 
-                if (distance < nearestDistance)
+                if (distance < nearestDistance && subject.IsBiggerThan(other))
                 {
-                    nearestAgent = agent;
+                    nearestAgent = other;
                     nearestDistance = distance;
                 }
             }
@@ -93,17 +107,48 @@ namespace AI_for_digital_games
             return nearestAgent;
         }
 
-        public bool FoodNearby(Agent subject)
+        Agent GetNearestThreat(Agent subject)
         {
-            foreach (Agent agent in agents)
-            {
-                if (agent == subject) continue;
+            Agent nearestAgent = null;
+            float nearestDistance = (float)Math.Sqrt(Math.Pow(Game1.ScreenWidth, 2) + Math.Pow(Game1.ScreenHeight, 2));
 
-                if (Vector2.Distance(agent.Position, subject.Position) < 500)
+            foreach (Agent other in agents)
+            {
+                if (other == subject) continue;
+
+                float distance = Vector2.Distance(subject.Position, other.Position);
+
+                if (distance < nearestDistance && other.IsBiggerThan(subject))
                 {
-                    //subject.MoveTo(agent.Position);
-                    return true;
+                    nearestAgent = other;
+                    nearestDistance = distance;
                 }
+            }
+
+            return nearestAgent;
+        }
+
+        public bool PreysNearby(Agent subject)
+        {
+            foreach (Agent other in agents)
+            {
+                if (other == subject) continue;
+
+                if(subject.IsNearPrey(other))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool ThreatsNearby(Agent subject)
+        {
+            foreach (Agent other in agents)
+            {
+                if (other == subject) continue;
+
+                if(subject.IsNearThreat(other))
+                    return true;
             }
 
             return false;
@@ -115,6 +160,8 @@ namespace AI_for_digital_games
             {
                 agent.Draw(spriteBatch);
             }
+
+            special.DrawDebug(spriteBatch);
         }
 
         public void AddAgent(Agent agent)

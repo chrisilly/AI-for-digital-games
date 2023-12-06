@@ -7,8 +7,8 @@ namespace AI_for_digital_games
 {
     public interface IBehaviourSystem
     {
-        void Update(Agent body);
-        void Decide(Agent body);
+        void Update(AgentHandler handler, Agent body, GameTime gameTime);
+        //void Decide(Agent body);
     }
 
     public class Game1 : Game
@@ -21,7 +21,6 @@ namespace AI_for_digital_games
         public static int ScreenHeight { get; private set; }
         public static Vector2 ScreenCenter { get { return new Vector2(ScreenWidth / 2, ScreenHeight / 2); } }
 
-        Agent subject;
         AgentHandler agentHandler;
         IBehaviourSystem brain;
         public static Texture2D texture;
@@ -40,7 +39,7 @@ namespace AI_for_digital_games
             ScreenHeight = GraphicsDevice.Viewport.Height;
 
             agentHandler = new AgentHandler();
-            brain = new BrainDead();
+            brain = new DecisionTreeBrain();
 
             base.Initialize();
         }
@@ -50,8 +49,7 @@ namespace AI_for_digital_games
             spriteBatch = new SpriteBatch(GraphicsDevice);
             texture = Content.Load<Texture2D>("tile64");
 
-            subject = new Agent(brain, Color.White, 0.5f);
-            agentHandler.AddAgent(subject);
+            agentHandler.SpawnSpecialAgent(brain);
         }
 
         protected override void Update(GameTime gameTime)
