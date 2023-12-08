@@ -20,6 +20,8 @@ namespace AI_for_digital_games
 
         public IBehaviourSystem Brain { get; private set; }
 
+        public IState State { get; set; }
+
         Texture2D texture;
         Vector2 origin;
         Color color;
@@ -42,6 +44,7 @@ namespace AI_for_digital_games
         public Agent(IBehaviourSystem brain)
         {
             this.Brain = brain;
+            this.State = new PatrollingState();
 
             this.texture = Game1.texture;
             this.color = Color.White;
