@@ -28,6 +28,9 @@ namespace AI_for_digital_games
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 920;
+            graphics.PreferredBackBufferHeight = 920;
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
