@@ -14,8 +14,8 @@ namespace AI_for_digital_games
 
         }
 
-        // public void Propogate() {}
-        // public void BackPropogate(){}
+        // public void Propagate() {}
+        // public void BackPropagate(){}
         // public void AdjustWeights(){}
 
         internal class Neuron
@@ -109,6 +109,85 @@ namespace AI_for_digital_games
             {
                 Console.WriteLine("{0}, Weight: {1}", Name, Weight);
             }
+
+            public int Count() { return Neurons.Count; }
+            // public int operator [](int index) { return Neurons[index] };
+            public Neuron this[int index]
+            {
+                get { return Neurons[index]; }
+                set { Neurons[index] = value; }
+            }
+        }
+    }
+
+    internal class BabyNeuralNetwork
+    {
+        private const int INPUT_NODES = 3;
+        private const int HIDDEN_NODES = 4;
+        private const int OUTPUT_NODES = 3;
+
+        private double[] inputLayer;
+        private double[] hiddenLayer;
+        private double[] outputLayer;
+        private double[,] weightsIH;
+        private double[,] weightsHO;
+
+        public void InitializeNetwork()
+        {
+            inputLayer = new double[INPUT_NODES];
+            hiddenLayer = new double[HIDDEN_NODES];
+            outputLayer = new double[OUTPUT_NODES];
+
+            weightsIH = new double[INPUT_NODES, HIDDEN_NODES];
+            weightsHO = new double[HIDDEN_NODES, OUTPUT_NODES];
+
+            // Initialize weights randomly
+            Random rand = new Random();
+            for (int i = 0; i < INPUT_NODES; i++)
+                for (int j = 0; j < HIDDEN_NODES; j++)
+                    weightsIH[i, j] = (rand.NextDouble() * 2) - 1;
+
+            for (int i = 0; i < HIDDEN_NODES; i++)
+                for (int j = 0; j < OUTPUT_NODES; j++)
+                    weightsHO[i, j] = (rand.NextDouble() * 2) - 1;
+        }
+
+        public double[] ComputeOutputs(double[] inputs)
+        {
+            if (inputs.Length != INPUT_NODES)
+                throw new ArgumentException("Invalid number of inputs");
+
+            // Copy inputs to input layer
+            Array.Copy(inputs, inputLayer, INPUT_NODES);
+
+            // Forward propagation
+            for (int i = 0; i < HIDDEN_NODES; i++)
+            {
+                double sum = 0;
+                for (int j = 0; j < INPUT_NODES; j++)
+                {
+                    sum += inputLayer[j] * weightsIH[j, i];
+                }
+                hiddenLayer[i] = Sigmoid(sum);
+            }
+
+            // Compute output layer
+            for (int i = 0; i < OUTPUT_NODES; i++)
+            {
+                double sum = 0;
+                for (int j = 0; j < HIDDEN_NODES; j++)
+                {
+                    sum += hiddenLayer[j] * weightsHO[j, i];
+                }
+                outputLayer[i] = Sigmoid(sum);
+            }
+
+            return outputLayer;
+        }
+
+        private double Sigmoid(double x)
+        {
+            return 1.0 / (1.0 + Math.Exp(-x));
         }
     }
 }

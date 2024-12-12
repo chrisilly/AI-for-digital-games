@@ -26,6 +26,7 @@ namespace AI_for_digital_games
         Vector2 origin;
         Color color;
         float scale;
+        public float Scale { get { return scale; } }
         Rectangle hitbox;
 
         Vector2 position;
@@ -105,12 +106,16 @@ namespace AI_for_digital_games
         #region Steering
         public void SteerToTarget(Agent target)
         {
+            if(target == null) return;
+
             speed = chaseSpeed;
             direction += target.Position - Position + (target.Velocity * 2f);
         }
 
         public void SteerFromDanger(Agent threat)
         {
+            if(threat == null) return;
+
             speed = fleeSpeed;
             //direction = threat.Velocity + new Vector2(threat.Velocity.Y, -threat.Velocity.X);
             direction +=  (Position - threat.Position) / ((float)Math.Pow(Vector2.Distance(Position, threat.Position), 1.5f) + 1) ;
