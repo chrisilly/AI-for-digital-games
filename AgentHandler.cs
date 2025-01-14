@@ -168,6 +168,17 @@ namespace AI_for_digital_games
             return GetDistance(subject, nearestAgent);
         }
 
+        public Vector2 GetDirectionToNearestAgent(Agent subject)
+        {
+            Agent nearestAgent = GetNearestAgent(subject);
+            if(subject == null || nearestAgent == null) return Vector2.Zero;
+
+            Vector2 direction = nearestAgent.Position - subject.Position;
+            direction.Normalize();
+
+            return direction;
+        }
+
         public bool PreysNearby(Agent subject)
         {
             foreach (Agent other in agents)

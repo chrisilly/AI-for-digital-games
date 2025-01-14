@@ -10,6 +10,7 @@ namespace AI_for_digital_games
         BabyNeuralNetwork babyNeuralNetwork;
 
         double distanceToNearestAgent = 0;
+        Vector2 directionToNearestAgent = Vector2.Zero;
         double[] inputs = { 0.1, 0.2, 0.3 };
         double[] outputs;
 
@@ -33,10 +34,11 @@ namespace AI_for_digital_games
             distanceToNearestAgent = handler.GetDistanceToNearestAgent(body);
                 // 2. direction.x point to nearest agent
                 // 3. direction.y to nearest agent
+            directionToNearestAgent = handler.GetDirectionToNearestAgent(body);
 
             inputs[0] = distanceToNearestAgent;
-            // inputs[1] = ;
-            // inputs[2] = ;
+            inputs[1] = directionToNearestAgent.X;
+            inputs[2] = directionToNearestAgent.Y;
 
             UpdateOutputs();
 
