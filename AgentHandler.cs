@@ -129,6 +129,45 @@ namespace AI_for_digital_games
             return nearestAgent;
         }
 
+        Agent GetNearestAgent(Agent subject)
+        {
+            Agent nearestAgent = null;
+
+            // defaults to a max distance of the game screen diagonal
+            float nearestDistance = (float)Math.Sqrt(Math.Pow(Game1.ScreenWidth, 2) + Math.Pow(Game1.ScreenHeight, 2));
+
+            foreach (Agent other in agents)
+            {
+                if(other == subject) continue;
+
+                float distance = GetDistance(subject, other);
+
+                if (distance < nearestDistance)
+                {
+                    nearestAgent = other;
+                    nearestDistance = distance;
+                }
+            }
+
+            // Debug.Assert(nearestAgent != null);
+            return nearestAgent;
+        }
+
+        public float GetDistance(Agent subject, Agent other)
+        {
+            if(subject == null || other == null) return 0.0f;
+            
+            float distance = Vector2.Distance(subject.Position, other.Position);
+
+            return distance;
+        }
+
+        public float GetDistanceToNearestAgent(Agent subject)
+        {
+            Agent nearestAgent = GetNearestAgent(subject);
+            return GetDistance(subject, nearestAgent);
+        }
+
         public bool PreysNearby(Agent subject)
         {
             foreach (Agent other in agents)
