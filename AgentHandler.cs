@@ -13,6 +13,7 @@ namespace AI_for_digital_games
     public class AgentHandler
     {
         List<Agent> agents = new List<Agent>();
+        IBehaviourSystem brain = new NeuralNetworkBrain();
         int dummySpawnInterval = Game1.random.Next(1000, 5000);
         float dummySpawnTimer = 0;
         int agentCap = 10;
@@ -69,7 +70,7 @@ namespace AI_for_digital_games
             if (dummySpawnTimer >= dummySpawnInterval)
             {
                 float randomSize = (float)Game1.random.NextDouble();
-                AddAgent(new Agent(new DecisionTreeBrain(), Color.Red, randomSize));
+                AddAgent(new Agent(brain, Color.Red, randomSize));
                 Debug.WriteLine("Spawned new dummy.");
                 dummySpawnInterval = Game1.random.Next(1000, 5000);
                 dummySpawnTimer = 0;

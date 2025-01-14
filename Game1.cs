@@ -22,7 +22,7 @@ namespace AI_for_digital_games
         public static Vector2 ScreenCenter { get { return new Vector2(ScreenWidth / 2, ScreenHeight / 2); } }
 
         AgentHandler agentHandler;
-        IBehaviourSystem brain;
+        IBehaviourSystem brain = new NeuralNetworkBrain();
         public static Texture2D texture;
 
         public Game1()
@@ -42,7 +42,7 @@ namespace AI_for_digital_games
             ScreenHeight = GraphicsDevice.Viewport.Height;
 
             agentHandler = new AgentHandler();
-            brain = new DecisionTreeBrain();
+            // brain = new DecisionTreeBrain();
 
             base.Initialize();
         }

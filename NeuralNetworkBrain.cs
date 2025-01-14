@@ -26,6 +26,10 @@ namespace AI_for_digital_games
         {
             body.Move(gameTime);
 
+            // Which variables to have as input nodes?
+                // 1. Distance to nearest agent
+                // 2. direction.x point to nearest agent
+                // 3. direction.y to nearest agent
             double[] inputs = { 0.1, 0.2, 0.3 };
             double[] outputs = babyNeuralNetwork.ComputeOutputs(inputs);
 
